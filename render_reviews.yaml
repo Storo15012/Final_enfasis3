@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: opinion-analysis-app
+    env: python
+    buildCommand: >
+      pip install --upgrade pip setuptools wheel && pip install -r requirements_reviews.txt
+    startCommand: gunicorn app_reviews:server
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.11
