@@ -1,25 +1,4 @@
-"""
-Dash application for analyzing customer opinions.
 
-This app allows users to upload a CSV file containing customer reviews or opinions
-about a product, company or place. Once the file is uploaded, the app performs
-basic text pre‑processing (lowercasing, removing punctuation, removing Spanish and
-English stop words and stemming) and then displays:
-
-1. A word cloud image of the most frequent terms.
-2. A bar chart of the top 10 most common words.
-3. An additional chart showing the distribution of review lengths (histogram).
-4. A sentiment classification for each review (positive, neutral or negative) using
-   the VADER sentiment analyser. A table displays the original review and its
-   assigned sentiment. A pie chart summarises the distribution of sentiment classes.
-5. A text input where users can enter a new comment and receive immediate
-   feedback on its predicted sentiment.
-
-The app is built with Dash and uses Plotly for interactive charts. Text
-processing relies on NLTK for tokenisation, stop word removal and stemming, and
-on the ``vaderSentiment`` library for sentiment analysis. Word clouds are
-generated with the ``wordcloud`` library and rendered as base64‑encoded images.
-"""
 
 import base64
 import io
@@ -43,7 +22,7 @@ from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 from wordcloud import WordCloud
 
 
-# Ensure NLTK data is downloaded only once. NLTK will store these in ~/.cache
+
 try:
     nltk.data.find("corpora/stopwords")
 except LookupError:
@@ -54,9 +33,7 @@ except LookupError:
     nltk.download("punkt")
 
 
-############################################################
-# Data classes and helper functions
-############################################################
+
 
 @dataclass
 class ProcessedText:
@@ -66,20 +43,7 @@ class ProcessedText:
 
 
 def preprocess_reviews(texts: List[str]) -> ProcessedText:
-    """Preprocess a list of review strings into tokens and frequencies.
 
-    Steps:
-    - Lowercase
-    - Remove punctuation and non‑alphabetic tokens
-    - Remove English and Spanish stop words
-    - Apply stemming (Spanish stemmer) to approximate lemmatisation
-
-    Args:
-        texts: List of review strings.
-
-    Returns:
-        ProcessedText with list of processed tokens and a frequency series.
-    """
     # Create stop word lists for both English and Spanish
     stop_en = set(stopwords.words("english"))
     stop_es = set(stopwords.words("spanish"))
@@ -107,14 +71,7 @@ def preprocess_reviews(texts: List[str]) -> ProcessedText:
 
 
 def generate_wordcloud(tokens: List[str]) -> Tuple[str, WordCloud]:
-    """Generate a word cloud from tokens and return a base64 image string.
-
-    Args:
-        tokens: List of processed tokens.
-
-    Returns:
-        A tuple of (base64 encoded image string, WordCloud object).
-    """
+  
     text = " ".join(tokens)
     wc = WordCloud(width=600, height=400, background_color="white").generate(text)
     # Convert to image and encode as base64
@@ -127,17 +84,7 @@ def generate_wordcloud(tokens: List[str]) -> Tuple[str, WordCloud]:
 
 
 def classify_sentiments(texts: List[str]) -> List[str]:
-    """Classify sentiment for a list of texts using VADER.
 
-    VADER returns a compound score between -1 and 1. We categorise as:
-    positive if compound >= 0.05, negative if compound <= -0.05, neutral otherwise.
-
-    Args:
-        texts: List of review strings.
-
-    Returns:
-        List of sentiment labels ("Positivo", "Negativo", "Neutral").
-    """
     analyser = SentimentIntensityAnalyzer()
     labels = []
     for t in texts:
@@ -152,17 +99,13 @@ def classify_sentiments(texts: List[str]) -> List[str]:
     return labels
 
 
-############################################################
-# Dash application configuration
-############################################################
 
-# External Bootstrap theme for basic styling
 external_stylesheets = [dbc.themes.CERULEAN]
 
 app = Dash(__name__, external_stylesheets=external_stylesheets)
 server = app.server
 
-# Helper layout components
+
 upload_component = dcc.Upload(
     id="upload-data",
     children=html.Div([
